@@ -1,0 +1,193 @@
+{
+    "name": "State Audit - Uptime",
+    "description": "",
+    "permissionLevel": "auditManageLevel1",
+    "rules": [
+        {
+            "severity": "MAJOR",
+            "name": "Uptime - IOS",
+            "os": "ios",
+            "source": "LATEST",
+            "commandSetResult": {
+                "type": "cliCommands",
+                "command": "show version | i uptime"
+            },
+            "type": "SIMPLE",
+            "description": "",
+            "enable": true,
+            "scope": "",
+            "scopeSeparateResults": false,
+            "thenExpression": {
+                "condition": "AND",
+                "rules": [
+                    {
+                        "id": "latestConfig",
+                        "field": "latestConfig",
+                        "type": "string",
+                        "input": "textarea",
+                        "operator": "must_contain_regex",
+                        "value": [
+                            "\\d+.month(s)"
+                        ]
+                    },
+                    {
+                        "id": "latestConfig",
+                        "field": "latestConfig",
+                        "type": "string",
+                        "input": "textarea",
+                        "operator": "must_contain_regex",
+                        "value": [
+                            "\\d+.week(s)"
+                        ]
+                    },
+                    {
+                        "id": "latestConfig",
+                        "field": "latestConfig",
+                        "type": "string",
+                        "input": "textarea",
+                        "operator": "must_contain_regex",
+                        "value": [
+                            "\\d+.day(s)"
+                        ]
+                    },
+                    {
+                        "id": "latestConfig",
+                        "field": "latestConfig",
+                        "type": "string",
+                        "input": "textarea",
+                        "operator": "must_not_contain_regex",
+                        "value": [
+                            "\\d+.year(s)"
+                        ]
+                    }
+                ],
+                "valid": true
+            },
+            "commandSetName": "ios_uptime"
+        },
+        {
+            "severity": "MAJOR",
+            "name": "Uptime - NXOS",
+            "os": "nxos",
+            "source": "LATEST",
+            "commandSetResult": {
+                "type": "cliCommands",
+                "command": "show version | i Kernel.uptime"
+            },
+            "type": "SIMPLE",
+            "description": "",
+            "enable": true,
+            "scope": "",
+            "scopeSeparateResults": false,
+            "thenExpression": {
+                "condition": "AND",
+                "rules": [
+                    {
+                        "id": "latestConfig",
+                        "field": "latestConfig",
+                        "type": "string",
+                        "input": "textarea",
+                        "operator": "must_contain_regex",
+                        "value": [
+                            "\\d+.month(s)"
+                        ]
+                    },
+                    {
+                        "id": "latestConfig",
+                        "field": "latestConfig",
+                        "type": "string",
+                        "input": "textarea",
+                        "operator": "must_contain_regex",
+                        "value": [
+                            "\\d+.week(s)"
+                        ]
+                    },
+                    {
+                        "id": "latestConfig",
+                        "field": "latestConfig",
+                        "type": "string",
+                        "input": "textarea",
+                        "operator": "must_contain_regex",
+                        "value": [
+                            "\\d+.days(s)"
+                        ]
+                    },
+                    {
+                        "id": "latestConfig",
+                        "field": "latestConfig",
+                        "type": "string",
+                        "input": "textarea",
+                        "operator": "must_not_contain_regex",
+                        "value": [
+                            "\\d+.year(s)"
+                        ]
+                    }
+                ],
+                "valid": true
+            },
+            "commandSetName": "nxos_show_version | i uptime"
+        },
+        {
+            "severity": "MAJOR",
+            "name": "Uptime - ASA",
+            "source": "LATEST",
+            "commandSetResult": {
+                "type": "cliCommands",
+                "command": "show version | grep day|hour|week|month|year|minute|second"
+            },
+            "type": "SIMPLE",
+            "description": "",
+            "enable": true,
+            "os": "asa",
+            "scope": "",
+            "scopeSeparateResults": false,
+            "thenExpression": {
+                "condition": "AND",
+                "rules": [
+                    {
+                        "id": "latestConfig",
+                        "field": "latestConfig",
+                        "type": "string",
+                        "input": "textarea",
+                        "operator": "must_contain_regex",
+                        "value": [
+                            "\\d+.month."
+                        ]
+                    },
+                    {
+                        "id": "latestConfig",
+                        "field": "latestConfig",
+                        "type": "string",
+                        "input": "textarea",
+                        "operator": "must_contain_regex",
+                        "value": [
+                            "\\d+.week."
+                        ]
+                    },
+                    {
+                        "id": "latestConfig",
+                        "field": "latestConfig",
+                        "type": "string",
+                        "input": "textarea",
+                        "operator": "must_contain_regex",
+                        "value": [
+                            "\\d+.days."
+                        ]
+                    },
+                    {
+                        "id": "latestConfig",
+                        "field": "latestConfig",
+                        "type": "string",
+                        "input": "textarea",
+                        "operator": "must_not_contain_regex",
+                        "value": [
+                            "\\d+.year."
+                        ]
+                    }
+                ],
+                "valid": true
+            },
+            "commandSetName": "asa_uptime"
+        }
+    ]
+}
