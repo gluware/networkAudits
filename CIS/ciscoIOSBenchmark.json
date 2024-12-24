@@ -1,0 +1,2663 @@
+[
+    {
+        "permissionLevel": "auditManageLevel1",
+        "rules": [
+            {
+                "severity": "MAJOR",
+                "name": "1.1.1.1 Require AAA Service",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Verify centralized authentication, authorization and accounting (AAA) service (new-model) is enabled.",
+                "scopeSeparateResults": false,
+                "scope": "",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "^aaa new-model"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "1.1.1.2 Require AAA Authentication for Login",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Verify authentication, authorization and accounting (AAA) method(s) configuration for case-sensitive, local user login authentication.",
+                "scopeSeparateResults": false,
+                "scope": "",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "^aaa authentication login \\S+ local-case"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All"
+            },
+            {
+                "severity": "MINOR",
+                "name": "1.1.1.3 Require AAA Authentication for Enable Mode",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Verify authentication, authorization and accounting (AAA) methods for enable mode authentication.",
+                "scopeSeparateResults": false,
+                "scope": "",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "^aaa authentication enable default"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "1.1.1.4 Require AAA Authentication for Local Console and VTY Lines",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Verify configurations for all management lines require login using the default or a named authentication, authorization and accounting (AAA) method list. If selected, this rule applies for both local and network AAA.",
+                "scopeSeparateResults": true,
+                "scope": "con|aux|tty|vty",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "login authentication \\S+"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All",
+                "conceptItem": "IOS_LineConVty"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "1.1.2.1 Require Local User and Encrypted Password",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "IF_THEN_ELSE",
+                "description": "Verify at least one local user exists and ensure all locally defined user passwords are protected by encryption.",
+                "scopeSeparateResults": true,
+                "scope": ".+",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "username \\S+ privilege \\d+ password \\S+"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "ifExpression": {
+                    "$and": [
+                        {
+                            "detectedSoftwareVersion": {
+                                "$regex": "(((11\\.\\.d+)))",
+                                "$options": "mi"
+                            }
+                        }
+                    ]
+                },
+                "elseExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "username \\S+ privilege \\d+ secret \\S+"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "commandSetName": "All",
+                "conceptItem": "IOS_Username"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "1.1.2.2-1 Require SSH for Remote Device Access",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Verify that SSH is the only protocol allowed for remote access to the device.",
+                "scopeSeparateResults": false,
+                "scope": "",
+                "thenExpression": {
+                    "condition": "OR",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "^ip ssh timeout \\d+"
+                            ]
+                        },
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "^ip ssh-timeout \\d+"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "1.1.2.2-2 Require SSH for Remote Device Access",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Verify that SSH is the only protocol allowed for remote access to the device.",
+                "scopeSeparateResults": false,
+                "scope": "^ip ssh",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "ip ssh authentication-retries \\d"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "all"
+                },
+                "commandSetName": "show run all"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "1.1.2.3 Require VTY Transport SSH",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Verify secure shell (SSH) access is configured on all management lines.",
+                "scopeSeparateResults": true,
+                "scope": "vty",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "transport input ssh"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All",
+                "conceptItem": "IOS_LineConVty"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "1.1.2.4 Require Timeout for Login Sessions",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Verify device is configured to automatically disconnect sessions after a fixed idle time.",
+                "scopeSeparateResults": false,
+                "scope": "aux|vty|con",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "exec-timeout 10|[1-9] [0-9]{2}$"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All",
+                "conceptItem": "IOS_LineConVty"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "1.1.2.5 Forbid Auxiliary Port",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Verify that the EXEC process is disabled on the auxiliary (aux) port.",
+                "scopeSeparateResults": true,
+                "scope": "aux",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "transport input none"
+                            ]
+                        },
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_not_contain_regex",
+                            "value": [
+                                "no exec"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All",
+                "conceptItem": "IOS_LineConVty"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "1.1.2.6 Require SSH Access Control",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Verify that management access to the device is restricted on all VTY lines.",
+                "scopeSeparateResults": true,
+                "scope": "vty",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "access-class \\S+ in"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All",
+                "conceptItem": "IOS_LineConVty"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "1.1.2.7 Require VTY ACL",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Verify that the required VTY access control list (ACL) exists to restrict inbound management sessions for all VTY lines.",
+                "scopeSeparateResults": true,
+                "scope": "100",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "\\d+ permit tcp \\S+ \\S+ any"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All",
+                "conceptItem": "IOS_NumberedAccessLists"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "1.1.3.1 Require EXEC Banner",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Verify an authorized EXEC banner is defined.",
+                "scopeSeparateResults": false,
+                "scope": "",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "^banner exec \\S+"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "1.1.3.2 Require Login Banner",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Verify an authorized login banner is defined.",
+                "scopeSeparateResults": false,
+                "scope": "",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "^banner login \\S+"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "1.1.3.3 Require MOTD Banner",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Verify an authorized message of the day (MOTD) banner is defined.",
+                "scopeSeparateResults": false,
+                "scope": "",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "^banner motd \\S+"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "1.1.4.1 Require Enable Secret",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Verify an enable secret password is defined using strong encryption to protect access to privileged EXEC mode (enable mode) which is used to configure the device.",
+                "scopeSeparateResults": false,
+                "scope": "",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "^enable secret \\d+ \\S+"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "1.1.4.2 Require Encrypted Line Passwords",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Verify an access password with strong encryption is configured on all management lines / VTY.",
+                "scopeSeparateResults": true,
+                "scope": "vty|aux|con",
+                "thenExpression": {
+                    "condition": "OR",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "password \\S+"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All",
+                "conceptItem": "IOS_LineConVty"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "1.1.4.3 Require Encrypted User Passwords",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "IF_THEN_ELSE",
+                "description": "Verify all locally defined users have encrypted passwords configured.",
+                "scopeSeparateResults": true,
+                "scope": ".+",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "username \\S+ privilege \\d+ password \\S+"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "ifExpression": {
+                    "$and": [
+                        {
+                            "detectedSoftwareVersion": {
+                                "$regex": "(((11\\.)))",
+                                "$options": "mi"
+                            }
+                        }
+                    ]
+                },
+                "elseExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "username \\S+ privilege \\d+ secret \\S+"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "commandSetName": "All",
+                "conceptItem": "IOS_Username"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "1.1.4.4 Require Password Encryption Service",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "rify encryption of passwords in device configuration is enabled.",
+                "scopeSeparateResults": true,
+                "scope": "",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "service password-encrypti"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All",
+                "conceptItem": "IOS_Service"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "1.1.5.1 Forbid SNMP Community String private",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Verify configuration does not contain default simple network management protocol (SNMP) community strings. The configuration cannot include snmp-server community commands with prohibited community strings.",
+                "scopeSeparateResults": true,
+                "scope": "",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_not_contain_regex",
+                            "value": [
+                                "^snmp-server community \\S+"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All",
+                "conceptItem": "IOS_Snmp"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "1.1.5.2 Forbid SNMP Community String public",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Verify configuration does not contain default simple network management protocol (SNMP) community strings. The configuration cannot include snmp-server community commands with prohibited community strings.",
+                "scopeSeparateResults": false,
+                "scope": "",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_not_contain_regex",
+                            "value": [
+                                "^snmp-server community \\S+"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "1.1.5.3 Forbid SNMP Read and Write Access",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Disable simple network management protocol (SNMP), read and write access, if not in use.",
+                "scopeSeparateResults": false,
+                "scope": "",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_not_contain_regex",
+                            "value": [
+                                "^snmp-server"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "1.1.5.4 Forbid SNMP Write Access",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Verify the device will not allow simple network management protocol (SNMP) write access.",
+                "scopeSeparateResults": false,
+                "scope": "",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_not_contain_regex",
+                            "value": [
+                                "^snmp-server community"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "1.1.5.5 Forbid SNMP without ACL",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Verify all simple network management protocol (SNMP) access is restricted using an access control list (ACL.)",
+                "scopeSeparateResults": true,
+                "scope": ".+",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "^snmp-server community \\S+ rw|ro|RW|RO \\S+"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All",
+                "conceptItem": "IOSXE_Snmp"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "1.1.5.6 Require a Defined SNMP ACL",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Verify a defined simple network management protocol (SNMP) access control list (ACL) exists with rules for restricting SNMP access to the device.",
+                "scopeSeparateResults": true,
+                "scope": "20",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "\\d+ permit \\S+",
+                                "\\d+ deny\\s+any log"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All",
+                "conceptItem": "IOS_NumberedAccessLists"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "1.1.5.7 Require Authorized Read SNMP Community Strings and Access Control",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Verify an authorized community string and access control is configured to restrict read access to the device.",
+                "scopeSeparateResults": false,
+                "scope": "",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "snmp-server community \\S+ ro|RO \\d+"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "1.2.1.1 -1Require Clock Timezone - UTC",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Verify the timezone for the device clock is configured to coordinated universal time (UTC) explicitly.",
+                "scopeSeparateResults": false,
+                "scope": "",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_not_contain_regex",
+                            "value": [
+                                "^clock timezone UTC \\d+"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "1.2.1.1-2 Require Clock Timezone - UTC",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Verify the timezone for the device clock is configured to coordinated universal time (UTC) explicitly.",
+                "scopeSeparateResults": false,
+                "scope": "",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "Summer time starts \\S+ UTC"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "cliCommands",
+                    "command": "show clock detail"
+                },
+                "commandSetName": "show clock detail"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "1.2.1.2 Forbid summer-time clock",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Verify clock summer-time is not configured to adjust the device clock for daylight saving time.",
+                "scopeSeparateResults": false,
+                "scope": "",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_not_contain_regex",
+                            "value": [
+                                "^clock summer-time"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All",
+                "conceptItem": "IOS_Clock"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "1.2.2.1 Forbid CDP Run Globally",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Disable Cisco Discovery Protocol (CDP) service at device level.",
+                "scopeSeparateResults": false,
+                "scope": "",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "^no cdp run"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "1.2.2.2 Forbid Finger Service",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "IF_THEN_ELSE",
+                "description": "Disable finger server.",
+                "scopeSeparateResults": false,
+                "scope": "",
+                "thenExpression": {
+                    "condition": "OR",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_not_contain_regex",
+                            "value": [
+                                "^service finger"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "ifExpression": {
+                    "$and": [
+                        {
+                            "detectedSoftwareVersion": {
+                                "$regex": "(((11\\.)))",
+                                "$options": "mi"
+                            }
+                        }
+                    ]
+                },
+                "elseExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_not_contain_regex",
+                            "value": [
+                                "^ip finger"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "commandSetName": "All"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "1.2.2.3 Forbid IP BOOTP server",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Disable bootstrap protocol (BOOTP) server.",
+                "scopeSeparateResults": false,
+                "scope": "",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_not_contain_regex",
+                            "value": [
+                                "^ip bootp server"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "1.2.2.4 Forbid Identification Service",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Disable identification (identd) server.",
+                "scopeSeparateResults": false,
+                "scope": "",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_not_contain_regex",
+                            "value": [
+                                "^identd"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "1.2.2.5 Forbid IP HTTP Server",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Disable HTTP server.",
+                "scopeSeparateResults": false,
+                "scope": "",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_not_contain_regex",
+                            "value": [
+                                "^ip http server"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "1.2.2.6 Forbid Remote Startup Configuration",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Disable autoloading of remote configuration files from a network server.",
+                "scopeSeparateResults": false,
+                "scope": "",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_not_contain_regex",
+                            "value": [
+                                "^boot network",
+                                "^service config"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All"
+            },
+            {
+                "severity": "MINOR",
+                "name": "1.2.2.7 Require TCP keepalives-in Service",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Verify transmission control protocol (TCP) keepalives-in service is enabled to kill abnormally terminated sessions.",
+                "scopeSeparateResults": false,
+                "scope": "",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "^service tcp-keepalives-in"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "1.2.2.8 Require TCP keepalives-out Service",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Use transmission control protocol (TCP) keepalives-out service to kill abnormally terminated sessions. Rationale: Stale connections",
+                "scopeSeparateResults": false,
+                "scope": "",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "^service tcp-keepalives-out"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "1.2.2.9 Forbid tcp-small-servers",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Disable unnecessary services such as echo, discard, chargen, etc.",
+                "scopeSeparateResults": false,
+                "scope": "",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_not_contain_regex",
+                            "value": [
+                                "^service tcp-small-servers"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "1.2.2.10 Forbid udp-small-servers",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Disable unnecessary services such as echo, discard, chargen, etc.",
+                "scopeSeparateResults": false,
+                "scope": "",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_not_contain_regex",
+                            "value": [
+                                "^service udp-small-servers"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "1.2.2.11 Forbid TFTP Server",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Disable trivial file transfer protocol (TFTP) server service.",
+                "scopeSeparateResults": false,
+                "scope": "",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_not_contain_regex",
+                            "value": [
+                                "^tftp-server"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "1.2.3.1 Require Logging",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Rules in the logging class enforce controls that provide a record of system activity and events.",
+                "scopeSeparateResults": false,
+                "scope": "",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "^logging on"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "cliCommands",
+                    "command": "show run all"
+                },
+                "commandSetName": "show run all"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "1.2.3.2 Require Logging Buffer",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Verify buffered logging (with minimum size) is configured to enable logging to internal device memory buffer.",
+                "scopeSeparateResults": false,
+                "scope": "",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "^logging buffered \\d+"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "1.2.3.3 Require Logging to Device Console",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Verify logging to device console is enabled and limited to a rational severity level to avoid impacting system performance and management.",
+                "scopeSeparateResults": false,
+                "scope": "",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "^logging console critical"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "1.2.3.4 Require Logging to Syslog Server",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Designate one or more syslog servers to centrally record system logs.",
+                "scopeSeparateResults": false,
+                "scope": "",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "^logging host \\S+"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "1.2.3.5 Require Logging Trap Severity Level",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Verify simple network management protocol (SNMP) trap and syslog are set to required level.",
+                "scopeSeparateResults": false,
+                "scope": "",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "^logging trap informational"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "cliCommands",
+                    "command": "show run all"
+                },
+                "commandSetName": "show run all"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "1.2.3.6 Require Service Timestamps for Debug Messages",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Configure debug message to include timestamps.",
+                "scopeSeparateResults": false,
+                "scope": "",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "^service timestamps debug datetime msec show-timezone"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "1.2.3.7 Require Service Timestamps in Log Messages",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Configure logging to include message timestamps.",
+                "scopeSeparateResults": false,
+                "scope": "",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "^service timestamps log datetime msec show-timezone"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "1.2.4.1 Require Primary NTP Server",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Verify configuration of a primary, trusted network protocol (NTP) timeserver used to synchronize the device clock.",
+                "scopeSeparateResults": false,
+                "scope": "",
+                "thenExpression": {
+                    "condition": "OR",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "^ntp server \\S+"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "1.2.4.2 Require Secondary NTP Server",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Verify configuration of a secondary, trusted network protocol (NTP) timeserver used to synchronize the device clock.",
+                "scopeSeparateResults": false,
+                "scope": "",
+                "thenExpression": {
+                    "condition": "OR",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "^ntp server \\S+",
+                                "^ntp server \\S+"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "1.2.4.3 Require Tertiary NTP Server",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Verify configuration of a tertiary, trusted network protocol (NTP) timeserver used to synchronize the device clock..",
+                "scopeSeparateResults": false,
+                "scope": "",
+                "thenExpression": {
+                    "condition": "OR",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "^ntp server \\S+",
+                                "^ntp server \\S+",
+                                "^ntp server \\S+"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "1.3.1.1 Forbid Directed Broadcast",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Disallow IP directed broadcast on each interface.",
+                "scopeSeparateResults": true,
+                "scope": ".+",
+                "thenExpression": {
+                    "condition": "OR",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_not_contain_regex",
+                            "value": [
+                                "ip directed-broadcast"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All",
+                "conceptItem": "IOS_Intf"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "1.3.1.2 Forbid IP source-route",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Disable source routing.",
+                "scopeSeparateResults": false,
+                "scope": "",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_not_contain_regex",
+                            "value": [
+                                "^ip source-route"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "2.1.1.1 Require AAA Authentication Enable",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Verify authentication, authorization and accounting (AAA) methods for enable mode authentication (with fall-back) is configured.",
+                "scopeSeparateResults": false,
+                "scope": "",
+                "thenExpression": {
+                    "condition": "OR",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "^aaa authentication enable \\S+ group tacacs\\+"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "2.1.1.2 Require AAA Authentication Login",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Verify authentication, authorization and accounting (AAA) methods for user login authentication (with fall-back) is configured.",
+                "scopeSeparateResults": false,
+                "scope": "",
+                "thenExpression": {
+                    "condition": "OR",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "^aaa authentication login \\S+ group tacacs\\+"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "2.1.1.3 Require AAA Accounting Commands",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Verify authentication, authorization and accounting (AAA) for commands is configured.",
+                "scopeSeparateResults": false,
+                "scope": "",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "^aaa accounting commands \\d+ \\w+ start-stop group-tacacs\\+"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "2.1.1.4 Require AAA Accounting Connection",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Verify authentication, authorization and accounting (AAA) accounting for connections is configured.",
+                "scopeSeparateResults": false,
+                "scope": "",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "^aaa accounting connection \\w+ start-stop group-tacacs\\+"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "2.1.1.5 Require AAA Accounting Exec",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Verify authentication, authorization and accounting (AAA) accounting for exec is configured.",
+                "scopeSeparateResults": false,
+                "scope": "",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "^aaa accounting exec \\w+ start-stop group-tacacs\\+"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "2.1.1.6 Require AAA Accounting Network",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Verify authentication, authorization and accounting (AAA) accounting for network events is configured.",
+                "scopeSeparateResults": false,
+                "scope": "",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "^aaa accounting network \\w+ start-stop group-tacacs\\+"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "2.1.1.7 Require AAA Accounting System",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Verify authentication, authorization and accounting (AAA) accounting for system events is configured.",
+                "scopeSeparateResults": false,
+                "scope": "",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "^aaa accounting system \\w+ start-stop group-tacacs\\+"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "2.2.1.1 Require Binding AAA Service to Loopback Interface",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Verify authentication, authorization and accounting (AAA) services are bound to the loopback interface.",
+                "scopeSeparateResults": false,
+                "scope": "",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "^ip tacacs\\+ source-interface [Ll]ooback"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "2.2.1.2 Require Binding NTP Service to Loopback Interface",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Verify the network time protocol (NTP) service is bound to the loopback interface.",
+                "scopeSeparateResults": false,
+                "scope": "",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "^ntp source [Ll]oopback"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "2.2.1.3 Require Binding TFTP Service to Loopback Interface",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Verify the trivial file transfer protocol (TCTP) client is bound to the loopback interface.",
+                "scopeSeparateResults": false,
+                "scope": "",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "^ip tftp source-interface [Ll]oopback"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "2.2.1.4 Require Loopback Interface",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Define and configure one loopback interface.",
+                "scopeSeparateResults": true,
+                "scope": "[Ll]oopback",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "ip address \\S+"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All",
+                "conceptItem": "IOS_Intf"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "2.2.1.5 Forbid Multiple Loopback Interfaces",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Define no more than one loopback interface.",
+                "scopeSeparateResults": false,
+                "scope": "^interface [Ll]oopback",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_only_contain_regex",
+                            "value": [
+                                "^interface Lloopback"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "2.3.1.1 Forbid Private Source Addresses from External Networks",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Verify the device is configured to restrict access for traffic from external networks that have source address that should only appear from internal networks.",
+                "scopeSeparateResults": false,
+                "scope": "",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "deny ip 127.0.0.0 0.255.255.255 any log",
+                                "deny ip 10.0.0.0 0.255.255.255 any log",
+                                "deny ip 0.0.0.0 0.255.255.255 any log",
+                                "deny ip 172.16.0.0 0.15.255.255 any log",
+                                "deny ip 192.168.0.0 0.0.255.255 any log",
+                                "deny ip 192.0.2.0 0.0.0.255 any log",
+                                "deny ip 169.254.0.0 0.0.255.255 any log",
+                                "deny ip 224.0.0.0 31.255.255.255 any log",
+                                "deny ip host 255.255.255.255 any log"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "2.3.1.2 Forbid External Source Addresses on Outbound Traffic",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Verify outbound traffic from your network includes only valid internal source addresses.",
+                "scopeSeparateResults": true,
+                "scope": "10",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "permit ip 10.0.0.0 0.255.255.255 any log"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All",
+                "conceptItem": "IOS_NumberedAccessLists"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "2.3.2.1 Require BGP Authentication if Protocol is Used",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "rify border gateway protocol (BGP) authentication is enabled, if routing protocol is used, where feasible.",
+                "scopeSeparateResults": true,
+                "scope": "bgp",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "neighbor \\S+ password \\S+"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All",
+                "conceptItem": "IOS_Router"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "2.3.2.2-1 Require EIGRP Authentication if Protocol is Used",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Verify enhanced interior gateway routing protocol (EIGRP) authentication is enabled, if routing protocol is used, where feasible.",
+                "scopeSeparateResults": true,
+                "scope": "eigrp",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "key \\d+",
+                                "key-string \\w+"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All",
+                "conceptItem": "IOS_Router"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "2.3.2.2-2 Require EIGRP Authentication if Protocol is Used",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Verify enhanced interior gateway routing protocol (EIGRP) authentication is enabled, if routing protocol is used, where feasible.",
+                "scopeSeparateResults": false,
+                "scope": "",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "^key chain \\S+"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "2.3.2.2-3 Require EIGRP Authentication if Protocol is Used",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Verify enhanced interior gateway routing protocol (EIGRP) authentication is enabled, if routing protocol is used, where feasible.",
+                "scopeSeparateResults": true,
+                "scope": "[Ll]oopback 0",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "ip authentication mode eigrp \\d+ md5",
+                                "ip authentication key-chain-eigrph \\d+ \\S+"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All",
+                "conceptItem": "IOS_Intf"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "2.3.2.3-1 Require OSPF Authentication if Protocol is Used",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Verify open shortest path first (OSPF) protocol authentication is enabled, if routing protocol is used, where feasible.",
+                "scopeSeparateResults": true,
+                "scope": "ospf",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "area \\d+ authentication message-digest"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All",
+                "conceptItem": "IOS_Router"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "2.3.2.3-2 Require OSPF Authentication if Protocol is Used",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Verify open shortest path first (OSPF) protocol authentication is enabled, if routing protocol is used, where feasible.",
+                "scopeSeparateResults": true,
+                "scope": "[Ll]oopback 0",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "ip ospf message-digest-key \\S+ md5 \\d+"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All",
+                "conceptItem": "IOS_Intf"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "2.3.2.4-1 Require RIPv2 Authentication if Protocol is used",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Verify routing information protocol (RIP) version two authentication is enabled, if routing protocol is used, where feasible.",
+                "scopeSeparateResults": true,
+                "scope": ".+",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "key \\d+",
+                                "key-string \\w+"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All",
+                "conceptItem": "IOS_KeyChain"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "2.3.2.4-2 Require RIPv2 Authentication if Protocol is used",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Verify routing information protocol (RIP) version two authentication is enabled, if routing protocol is used, where feasible.",
+                "scopeSeparateResults": true,
+                "scope": "[Ll]oopback 0",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "ip rip authentication key-chain \\S+",
+                                "ip rip authentication mode md5"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All",
+                "conceptItem": "IOS_Intf"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "2.3.3.1-1 Require Unicast Reverse-Path Forwarding",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Verify unicast reverse-path forwarding (RPF) is enabled on all external or high risk interfaces.",
+                "scopeSeparateResults": false,
+                "scope": "",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "^ip cef"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "cliCommands",
+                    "command": "show run all"
+                },
+                "commandSetName": "show run all"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "2.3.3.1-2 Require Unicast Reverse-Path Forwarding",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "IF_THEN_ELSE",
+                "description": "Verify unicast reverse-path forwarding (RPF) is enabled on all external or high risk interfaces.",
+                "scopeSeparateResults": true,
+                "scope": ",+",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "ip verify unicast reverse-path"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "ifExpression": {
+                    "$and": [
+                        {
+                            "detectedSoftwareVersion": {
+                                "$regex": "(((11\\.)))",
+                                "$options": "mi"
+                            }
+                        }
+                    ]
+                },
+                "elseExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "ip verify unicast reverse-path rx"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "commandSetName": "All",
+                "conceptItem": "IOS_Intf"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "2.3.3.2 Forbid IP Proxy ARP",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Verify proxy ARP is disabled on all interfaces.",
+                "scopeSeparateResults": true,
+                "scope": ".+",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_not_contain_regex",
+                            "value": [
+                                "^ip proxy-arp"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All",
+                "conceptItem": "IOS_Intf"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "2.3.3.3 Forbid Tunnel Interfaces",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Verify no tunnel interfaces are defined.",
+                "scopeSeparateResults": false,
+                "scope": "",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_not_contain_regex",
+                            "value": [
+                                "^interface tunnel \\S+"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "1.1.1 Appendix A",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Prior to configuring SSH access, perform the following prerequisite tasks:",
+                "scopeSeparateResults": false,
+                "scope": "",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "^hostname \\S+",
+                                "^domain-name \\S+"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All"
+            },
+            {
+                "severity": "MAJOR",
+                "name": "1.1.2 Appendix A",
+                "os": "ios",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "description": "Prior to configuring SSH access, perform the following prerequisite tasks:",
+                "scopeSeparateResults": false,
+                "scope": "",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "^hostname \\S+",
+                                "^domain-name \\S+"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "enable": true,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All"
+            }
+        ],
+        "runLevel": "auditRunLevel1",
+        "description": "This Audit Policy is created based on CIS Cisco IOS 16 Benchmark - v1.1.1",
+        "name": "CIS Cisco IOS 16 Benchmark"
+    }
+]
