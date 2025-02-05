@@ -1,0 +1,159 @@
+[
+    {
+        "name": "Sample Juniper JunOS - Global Standards",
+        "description": "Banner, DNS, Snmp, Syslog",
+        "lastAuditErrorMsg": "",
+        "permissionLevel": "auditManageLevel1",
+        "runLevel": "auditRunLevel1",
+        "rules": [
+            {
+                "name": "Syslog",
+                "description": "Check to make sure correct syslog servers exist",
+                "os": "any",
+                "scope": "",
+                "scopeSeparateResults": false,
+                "severity": "INFO",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "set system syslog host 10.2.155.155 any any",
+                                "set system syslog host 10.3.155.155 any any"
+                            ]
+                        },
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_not_contain_regex",
+                            "value": [
+                                "set system syslog host 10.1.155.155 any any"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "conceptItem": null,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All"
+            },
+            {
+                "name": "SNMP",
+                "description": "",
+                "os": "any",
+                "scope": "",
+                "scopeSeparateResults": false,
+                "severity": "INFO",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "set snmp location \"Gluware LAB\"",
+                                "set snmp contact \"NOC Contact"
+                            ]
+                        },
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_not_contain_regex",
+                            "value": [
+                                "set snmp community public",
+                                "set snmp community private"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "conceptItem": null,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All"
+            },
+            {
+                "name": "DNS Nameserver",
+                "description": "",
+                "os": "any",
+                "scope": "",
+                "scopeSeparateResults": false,
+                "severity": "INFO",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "set system name-server 10.8.8.8",
+                                "set system name-server 10.4.4.4"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "conceptItem": null,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All"
+            },
+            {
+                "name": "Banner",
+                "description": "",
+                "os": "any",
+                "scope": "",
+                "scopeSeparateResults": false,
+                "severity": "INFO",
+                "source": "LATEST",
+                "type": "SIMPLE",
+                "thenExpression": {
+                    "condition": "AND",
+                    "rules": [
+                        {
+                            "id": "latestConfig",
+                            "field": "latestConfig",
+                            "type": "string",
+                            "input": "textarea",
+                            "operator": "must_contain_regex",
+                            "value": [
+                                "set system login message .+"
+                            ]
+                        }
+                    ],
+                    "valid": true
+                },
+                "conceptItem": null,
+                "commandSetResult": {
+                    "type": "basicMode"
+                },
+                "commandSetName": "All"
+            }
+        ]
+    }
+]
